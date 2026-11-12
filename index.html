@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JIRO AI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app">
+        <header class="header">
+            <h2>JIRO AI</h2>
+            <button id="newChat">New chat</button>
+        </header>
+
+        <main class="chat-area" id="chatArea">
+            <div class="welcome">
+                <h1>JIRO AI</h1>
+                <p>How can I help you today?</p>
+            </div>
+        </main>
+
+        <footer class="input-area">
+            <form id="chatForm">
+                <input
+                    type="text"
+                    id="userInput"
+                    placeholder="Message JIRO AI..."
+                    autocomplete="off"
+                    required
+                >
+                <button type="submit">↑</button>
+            </form>
+            <p>JIRO AI can make mistakes. Check important information.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
