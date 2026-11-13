@@ -54,3 +54,10 @@ newChat.addEventListener("click", function() {
     </div>
   `;
 });
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/service-worker.js")
+            .then(() => console.log("JIRO AI Service Worker registered!"))
+            .catch(error => console.error("Service Worker error:", error));
+    });
+}
