@@ -1,64 +1,142 @@
-exports.handler = async function (event) {
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: "Method not allowed" })
-    };
-  }
-
-  try {
-    const { message } = JSON.parse(event.body || "{}");
-
-    if (!message) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Message is required" })
-      };
+exports.handler = async (event) => {
+    if (event.httpMethod !== "POST") {
+        return {
+            statusCode: 405,
+            body: JSON.stringify({ error: "Method not allowed" })
+        };
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    try {
+        const apiKey = process.env.GEMINI_API_KEY;
 
-    if (!apiKey) {
-      throw new Error("Gemini API key is missing");
-    }
+        if (!apiKey) {
+            return {
+                statusCode: 500,
+                body: JSON.stringify({
+                    error: "Gemini API key is not configured."
+                })
+            };
+        }
 
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: message }]
+        const { message, image } = JSON.parse(event.body || "{}");
+
+        const text = typeof message === "string" ? message.trim() : "";
+
+        if (!text && !image) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    error: "Please enter a message or upload an image."
+                })
+            };
+        }
+
+        const parts = [];
+
+        if (image) {
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ];
+
+            if (
+                !allowedTypes.includes(image.mimeType) ||
+                typeof image.data !== "string" ||
+                !image.data
+            ) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        error: "Unsupported or invalid image."
+                    })
+                };
             }
-          ]
-        })
-      }
-    );
 
-    const data = await response.json();
+            if (image.data.length > 4 * 1024 * 1024) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        error: "Image is too large. Please use a smaller image."
+                    })
+                };
+            }
 
-    if (!response.ok) {
-      throw new Error(data.error?.message || "Gemini request failed");
+            parts.push({
+                inlineData: {
+                    mimeType: image.mimeType,
+                    data: image.data
+                }
+            });
+        }
+
+        parts.push({
+            text: text || "Please describe this image."
+        });
+
+        const response = await fetch(
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": apiKey
+                },
+                body: JSON.stringify({
+                    systemInstruction: {
+                        parts: [{
+                            text: "You are JIRO AI, a helpful and friendly AI assistant. Answer clearly and naturally."
+                        }]
+                    },
+                    contents: [{
+                        parts: parts
+                    }],
+                    generationConfig: {
+                        maxOutputTokens: 800
+                    }
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error("Gemini API error:", data);
+
+            return {
+                statusCode: 502,
+                body: JSON.stringify({
+                    error: data.error?.message ||
+                        "Gemini API request failed."
+                })
+            };
+        }
+
+        const reply = data.candidates?.[0]?.content?.parts
+            ?.map(part => part.text || "")
+            .join("")
+            .trim();
+
+        if (!reply) {
+            throw new Error("No text response received.");
+        }
+
+        return {
+            statusCode: 200,
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ reply })
+        };
+
+    } catch (error) {
+        console.error(error);
+
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                error: "Something went wrong. Please try again."
+            })
+        };
     }
-
-    const reply =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Sorry, I couldn't generate a reply.";
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ reply })
-    };
-
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message })
-    };
-  }
 };
