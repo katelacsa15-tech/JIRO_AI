@@ -5,7 +5,7 @@ const newChat = document.getElementById("newChat");
 
 function addMessage(text, sender) {
   const message = document.createElement("div");
-  message.className = message ${sender};
+  message.className = `message ${sender}`;
   message.textContent = text;
   chatArea.appendChild(message);
   chatArea.scrollTop = chatArea.scrollHeight;
