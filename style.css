@@ -73,6 +73,7 @@ button {
     border: 1px solid #dddddd;
     border-radius: 28px;
     padding: 8px 10px 8px 20px;
+    gap: 8px;
 }
 
 #userInput {
