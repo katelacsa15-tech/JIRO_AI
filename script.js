@@ -2,11 +2,11 @@ const chatForm = document.getElementById("chatForm");
 const userInput = document.getElementById("userInput");
 const imageInput = document.getElementById("imageInput");
 const chatArea = document.getElementById("chatArea");
-const newChat = document.getElementById("newchat");
+const newChat = document.getElementById("newChat");
 
 function addMessage(text, sender) {
     const message = document.createElement("div");
-    message.className = message ${sender};
+    message.className = `message ${sender}`;
     message.textContent = text;
     chatArea.appendChild(message);
     chatArea.scrollTop = chatArea.scrollHeight;
