@@ -28,17 +28,25 @@
 
         <footer class="input-area">
             <form id="chatForm">
-                <input
-                    type="text"
-                    id="userInput"
-                    placeholder="Message JIRO AI..."
-                    autocomplete="off"
-                > <input
-                      type="file"
-                      id="imageInput"
-                      accept="image/*"
-                <button type="submit">↑</button>
-            </form>
+    <label for="imageInput" class="attach-button">+</label>
+
+    <input
+        type="file"
+        id="imageInput"
+        accept="image/*"
+        hidden
+    >
+
+    <input
+        type="text"
+        id="userInput"
+        placeholder="Message JIRO AI..."
+        autocomplete="off"
+    >
+
+    <button type="submit" id="sendButton">↑</button>
+</form>
+
             <p>JIRO AI can make mistakes. Check important information.</p>
         </footer>
     </div>
