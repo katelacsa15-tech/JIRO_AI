@@ -93,10 +93,10 @@ chatForm.addEventListener("submit", async function(event) {
             data.reply || "No response received.";
 
     } catch (error) {
-        loadingMessage.textContent =
-            "Sorry! JIRO AI is temporarily unavailable.";
-        console.error(error);
-    }
+    loadingMessage.textContent =
+        "Sorry! JIRO AI is temporarily unavailable.";
+    console.error(error);
+}
 });
 
 newChat.addEventListener("click", function() {
