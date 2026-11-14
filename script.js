@@ -94,8 +94,8 @@ chatForm.addEventListener("submit", async function(event) {
 
     } catch (error) {
     loadingMessage.textContent =
-        "Sorry! JIRO AI is temporarily unavailable.";
-    console.error(error);
+        "JIRO AI error: " + error.message;
+    console.error("JIRO AI error:", error);
 }
 });
 
